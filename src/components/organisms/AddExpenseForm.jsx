@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "@/components/atoms/Button";
-import Input from "@/components/atoms/Input";
-import Card from "@/components/atoms/Card";
-import CurrencySelector from "@/components/molecules/CurrencySelector";
-import SplitMethodSelector from "@/components/molecules/SplitMethodSelector";
-import ApperIcon from "@/components/ApperIcon";
+import ReceiptImageViewer from "@/components/molecules/ReceiptImageViewer";
 import { expenseService } from "@/services/api/expenseService";
 import { groupService } from "@/services/api/groupService";
 import { currencyService } from "@/services/api/currencyService";
 import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import CurrencySelector from "@/components/molecules/CurrencySelector";
+import SplitMethodSelector from "@/components/molecules/SplitMethodSelector";
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
+import Input from "@/components/atoms/Input";
 
 const AddExpenseForm = () => {
   const navigate = useNavigate();
@@ -27,9 +28,10 @@ const AddExpenseForm = () => {
   const [splits, setSplits] = useState({});
   const [groups, setGroups] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
-  const [exchangeRates, setExchangeRates] = useState({});
+const [exchangeRates, setExchangeRates] = useState({});
   const [loading, setLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [showReceiptViewer, setShowReceiptViewer] = useState(false);
 
   useEffect(() => {
     loadInitialData();
@@ -253,13 +255,23 @@ const AddExpenseForm = () => {
               </Button>
             </label>
 
-            {formData.receiptImage && (
+{formData.receiptImage && (
               <div className="mt-4">
-                <img
-                  src={formData.receiptImage}
-                  alt="Uploaded receipt"
-                  className="max-w-48 max-h-32 object-cover rounded-lg mx-auto border-2 border-gray-200"
-                />
+                <div className="relative group cursor-pointer" onClick={() => setShowReceiptViewer(true)}>
+                  <img
+                    src={formData.receiptImage}
+                    alt="Uploaded receipt"
+                    className="max-w-48 max-h-32 object-cover rounded-lg mx-auto border-2 border-gray-200 transition-all duration-200 group-hover:border-primary group-hover:shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-all duration-200 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
+                      <ApperIcon name="ZoomIn" size={16} className="text-primary" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  Click to view full size
+                </p>
               </div>
             )}
           </div>
@@ -400,10 +412,16 @@ const AddExpenseForm = () => {
               </>
             )}
           </Button>
-        </div>
+</div>
       </form>
+      {/* Receipt Image Viewer */}
+      <ReceiptImageViewer
+        isOpen={showReceiptViewer}
+        onClose={() => setShowReceiptViewer(false)}
+        imageUrl={formData.receiptImage}
+        imageName="Receipt"
+      />
     </div>
-  );
 };
 
 export default AddExpenseForm;
