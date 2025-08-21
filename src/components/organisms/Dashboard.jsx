@@ -1,32 +1,35 @@
-import React, { useState, useEffect } from "react";
-import BalanceCard from "@/components/molecules/BalanceCard";
-import ExpenseItem from "@/components/molecules/ExpenseItem";
-import Button from "@/components/atoms/Button";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
+import TripCard from "@/components/molecules/TripCard";
 import { expenseService } from "@/services/api/expenseService";
 import { balanceService } from "@/services/api/balanceService";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import BalanceCard from "@/components/molecules/BalanceCard";
+import ExpenseItem from "@/components/molecules/ExpenseItem";
+import Button from "@/components/atoms/Button";
 
 const Dashboard = () => {
   const [recentExpenses, setRecentExpenses] = useState([]);
   const [userBalance, setUserBalance] = useState(null);
+  const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const loadDashboardData = async () => {
+const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError("");
 
-      // Load recent expenses and user balance
-      const [expenses, balance] = await Promise.all([
+      // Load recent expenses, user balance, and trips
+      const [expenses, balance, tripSummary] = await Promise.all([
         expenseService.getAll(),
-        balanceService.getCurrentUserBalance()
+        balanceService.getCurrentUserBalance(),
+        expenseService.getTripSummary()
       ]);
 
       // Get the 5 most recent expenses
@@ -36,6 +39,7 @@ const Dashboard = () => {
 
       setRecentExpenses(sortedExpenses);
       setUserBalance(balance);
+      setTrips(tripSummary);
     } catch (err) {
       setError(err.message || "Failed to load dashboard data");
       toast.error("Failed to load dashboard data");
@@ -62,10 +66,57 @@ const Dashboard = () => {
     navigate("/add-expense");
   };
 
-  const handleViewExpense = (expense) => {
+const handleViewExpense = (expense) => {
     navigate(`/expenses/${expense.Id}`);
   };
 
+  const handleExport = async (tripName, format) => {
+    try {
+      const exportData = await expenseService.exportTripData(tripName, format);
+      
+      if (format === 'csv') {
+        // Create and download CSV file
+        const blob = new Blob([exportData], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${tripName.replace(/\s+/g, '_')}_expenses.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success(`CSV exported for ${tripName}!`);
+      } else if (format === 'pdf') {
+        // For PDF, we would typically use a library like jsPDF
+        // For now, we'll show the structured data in console and notify user
+        console.log('PDF Data:', exportData);
+        toast.info(`PDF export for ${tripName} is being prepared...`);
+        
+        // Create a simple text file as PDF placeholder
+        const pdfContent = `Trip: ${exportData.tripName}
+Total Amount: $${exportData.totalAmount.toFixed(2)}
+Number of Expenses: ${exportData.expenseCount}
+
+Expenses:
+${exportData.expenses.map(exp => 
+  `${exp.date} - ${exp.description}: $${exp.amount} (${exp.category}) - Paid by ${exp.paidBy}`
+).join('\n')}`;
+        
+        const blob = new Blob([pdfContent], { type: 'text/plain;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${tripName.replace(/\s+/g, '_')}_expenses.txt`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success(`Export file created for ${tripName}!`);
+      }
+    } catch (err) {
+      toast.error(`Failed to export ${tripName} data: ${err.message}`);
+    }
+  };
   if (loading) return <Loading variant="dashboard" />;
   if (error) return <Error onRetry={loadDashboardData} />;
 
@@ -150,8 +201,47 @@ variant="accent"
           </div>
         </div>
       </div>
+{/* Trip/Event Buckets */}
+      {trips.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 font-display">
+              Trip & Event Buckets
+            </h2>
+            <div className="flex items-center text-sm text-gray-600">
+              <ApperIcon name="MapPin" size={16} className="mr-2" />
+              {trips.length} {trips.length === 1 ? 'trip' : 'trips'}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {trips.slice(0, 6).map((trip, index) => (
+              <TripCard
+                key={index}
+                trip={trip}
+                onExport={handleExport}
+                className="h-full"
+              />
+            ))}
+          </div>
+          
+          {trips.length > 6 && (
+            <div className="mt-4 sm:mt-6 text-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/trips")}
+                className="text-primary hover:text-primary-dark hover:bg-primary/5 min-h-[36px]"
+              >
+                View All Trips
+                <ApperIcon name="ArrowRight" size={16} className="ml-2" />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
-{/* Recent Expenses */}
+      {/* Recent Expenses */}
       <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 font-display">

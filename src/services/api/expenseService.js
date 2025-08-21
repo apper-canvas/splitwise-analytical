@@ -179,7 +179,98 @@ return expenseDate >= start && expenseDate <= end;
     }
 
     return filtered;
+return filtered;
+  }
+
+  async getExpensesByTrip(tripName) {
+    await delay(300);
+    if (!tripName) return [];
+    return this.expenses.filter(expense => 
+      expense.trip && expense.trip.toLowerCase() === tripName.toLowerCase()
+    );
+  }
+
+  async getTripSummary() {
+    await delay(350);
+    const trips = {};
+    
+    this.expenses.forEach(expense => {
+      if (expense.trip) {
+        const tripName = expense.trip;
+        if (!trips[tripName]) {
+          trips[tripName] = {
+            name: tripName,
+            totalAmount: 0,
+            expenseCount: 0,
+            categories: new Set(),
+            participants: new Set(),
+            expenses: []
+          };
+        }
+        trips[tripName].totalAmount += expense.amount;
+        trips[tripName].expenseCount += 1;
+        trips[tripName].categories.add(expense.category);
+        trips[tripName].participants.add(expense.paidBy);
+        expense.sharedWith?.forEach(person => trips[tripName].participants.add(person));
+        trips[tripName].expenses.push(expense);
+      }
+    });
+
+    // Convert sets to arrays and sort by total amount
+    return Object.values(trips)
+      .map(trip => ({
+        ...trip,
+        categories: Array.from(trip.categories),
+        participants: Array.from(trip.participants)
+      }))
+      .sort((a, b) => b.totalAmount - a.totalAmount);
+  }
+
+  async exportTripData(tripName, format = 'csv') {
+    await delay(400);
+    const expenses = await this.getExpensesByTrip(tripName);
+    
+    if (expenses.length === 0) {
+      throw new Error('No expenses found for this trip');
+    }
+
+    if (format === 'csv') {
+      return this.generateCSV(expenses, tripName);
+    } else if (format === 'pdf') {
+      // For PDF, we'll return structured data that can be used by a PDF library
+      return {
+        tripName,
+        totalAmount: expenses.reduce((sum, exp) => sum + exp.amount, 0),
+        expenseCount: expenses.length,
+        expenses: expenses.map(exp => ({
+          date: new Date(exp.createdAt).toLocaleDateString(),
+          description: exp.description,
+          amount: exp.amount,
+          category: exp.category,
+          paidBy: exp.paidBy,
+          currency: exp.currency
+        }))
+      };
+    }
+  }
+
+  generateCSV(expenses, tripName) {
+    const headers = ['Date', 'Description', 'Amount', 'Currency', 'Category', 'Paid By', 'Shared With'];
+    const csvContent = [
+      `Trip: ${tripName}`,
+      '',
+      headers.join(','),
+      ...expenses.map(expense => [
+        new Date(expense.createdAt).toLocaleDateString(),
+        `"${expense.description}"`,
+        expense.amount,
+        expense.currency,
+        expense.category,
+        expense.paidBy,
+        `"${expense.sharedWith ? expense.sharedWith.join(', ') : ''}"`
+      ].join(','))
+    ].join('\n');
+
+    return csvContent;
   }
 }
-
-export const expenseService = new ExpenseService();
