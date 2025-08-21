@@ -1,15 +1,15 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import ExpenseDetailPage from "@/components/pages/ExpenseDetailPage";
+import AddExpensePage from "@/components/pages/AddExpensePage";
+import SettingsPage from "@/components/pages/SettingsPage";
+import CreateGroupPage from "@/components/pages/CreateGroupPage";
+import GroupsPage from "@/components/pages/GroupsPage";
+import ExpenseHistoryPage from "@/components/pages/ExpenseHistoryPage";
+import DashboardPage from "@/components/pages/DashboardPage";
 import BottomNavigation from "@/components/organisms/BottomNavigation";
 import OfflineBanner from "@/components/molecules/OfflineBanner";
-import DashboardPage from "@/components/pages/DashboardPage";
-import AddExpensePage from "@/components/pages/AddExpensePage";
-import ExpenseHistoryPage from "@/components/pages/ExpenseHistoryPage";
-import GroupsPage from "@/components/pages/GroupsPage";
-import CreateGroupPage from "@/components/pages/CreateGroupPage";
-import SettingsPage from "@/components/pages/SettingsPage";
-
 function App() {
   return (
 <BrowserRouter>
@@ -23,8 +23,9 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-expense" element={<AddExpensePage />} />
 <Route path="/history" element={<ExpenseHistoryPage />} />
-            <Route path="/groups" element={<GroupsPage />} />
+<Route path="/groups" element={<GroupsPage />} />
             <Route path="/create-group" element={<CreateGroupPage />} />
+            <Route path="/expense/:id" element={<ExpenseDetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </main>

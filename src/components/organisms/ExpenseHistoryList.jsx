@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { expenseService } from '@/services/api/expenseService';
 import { groupService } from '@/services/api/groupService';
 import ExpenseItem from '@/components/molecules/ExpenseItem';
@@ -13,6 +14,7 @@ import { toast } from 'react-toastify';
 import { cn } from '@/utils/cn';
 
 const ExpenseHistoryList = () => {
+  const navigate = useNavigate();
   const [expenses, setExpenses] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,10 +99,9 @@ const ExpenseHistoryList = () => {
            filters.sortBy !== 'date-desc';
   };
 
-  const handleExpenseClick = (expense) => {
-    toast.info(`Expense: ${expense.description} - $${expense.amount.toFixed(2)}`);
+const handleExpenseClick = (expense) => {
+    navigate(`/expense/${expense.Id}`);
   };
-
   if (loading) {
     return <Loading message="Loading expense history..." />;
   }
