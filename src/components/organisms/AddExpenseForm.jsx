@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ReceiptImageViewer from "@/components/molecules/ReceiptImageViewer";
 import { expenseService } from "@/services/api/expenseService";
 import { groupService } from "@/services/api/groupService";
 import { currencyService } from "@/services/api/currencyService";
 import { toast } from "react-toastify";
 import ApperIcon from "@/components/ApperIcon";
+import ReceiptImageViewer from "@/components/molecules/ReceiptImageViewer";
 import CurrencySelector from "@/components/molecules/CurrencySelector";
 import SplitMethodSelector from "@/components/molecules/SplitMethodSelector";
 import Button from "@/components/atoms/Button";
@@ -253,9 +253,9 @@ const [exchangeRates, setExchangeRates] = useState({});
                   </>
                 )}
               </Button>
-            </label>
+</label>
 
-{formData.receiptImage && (
+            {formData.receiptImage && (
               <div className="mt-4">
                 <div className="relative group cursor-pointer" onClick={() => setShowReceiptViewer(true)}>
                   <img
