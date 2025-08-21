@@ -269,6 +269,10 @@ return filtered;
       ].join(','))
     ].join('\n');
 
-    return csvContent;
+return csvContent;
   }
 }
+
+// Create and export an instance of the service
+const expenseService = new ExpenseService();
+export { expenseService };
