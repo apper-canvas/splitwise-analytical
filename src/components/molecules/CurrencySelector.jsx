@@ -11,7 +11,7 @@ const CurrencySelector = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const currencyList = currencies || [
+const currencyList = currencies || [
     { code: "USD", symbol: "$", name: "US Dollar", flag: "🇺🇸" },
     { code: "EUR", symbol: "€", name: "Euro", flag: "🇪🇺" },
     { code: "GBP", symbol: "£", name: "British Pound", flag: "🇬🇧" },
@@ -21,7 +21,10 @@ const CurrencySelector = ({
     { code: "AUD", symbol: "A$", name: "Australian Dollar", flag: "🇦🇺" },
   ];
 
-  const selectedCurrency = currencyList.find(c => c.code === value) || currencyList[0];
+  // Ensure selectedCurrency always has a valid object with proper fallbacks
+  const defaultCurrency = { code: "USD", symbol: "$", name: "US Dollar", flag: "🇺🇸" };
+  const foundCurrency = currencyList.find(c => c?.code === value);
+  const selectedCurrency = foundCurrency || currencyList[0] || defaultCurrency;
 
   const handleSelect = (currency) => {
     onChange(currency.code);
