@@ -241,12 +241,12 @@ const [exchangeRates, setExchangeRates] = useState({});
                 className="relative"
                 disabled={isScanning}
               >
-                {isScanning ? (
+{isScanning ? (
                   <>
                     <ApperIcon name="Loader" size={16} className="mr-2 animate-spin" />
                     Scanning...
                   </>
-) : (
+                ) : (
                   <>
                     <ApperIcon name="Upload" size={16} className="mr-2" />
                     Upload Receipt
@@ -400,7 +400,7 @@ const [exchangeRates, setExchangeRates] = useState({});
             className="flex-1"
             disabled={loading}
           >
-            {loading ? (
+{loading ? (
               <>
                 <ApperIcon name="Loader" size={16} className="mr-2 animate-spin" />
                 Adding...
@@ -410,7 +410,7 @@ const [exchangeRates, setExchangeRates] = useState({});
                 <ApperIcon name="Plus" size={16} className="mr-2" />
                 Add Expense
               </>
-)}
+            )}
           </Button>
         </div>
       </form>
@@ -419,9 +419,10 @@ const [exchangeRates, setExchangeRates] = useState({});
         isOpen={showReceiptViewer}
         onClose={() => setShowReceiptViewer(false)}
         imageUrl={formData.receiptImage}
-        imageName="Receipt"
+imageName="Receipt"
       />
     </div>
+  );
 };
 
 export default AddExpenseForm;
