@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import BottomNavigation from "@/components/organisms/BottomNavigation";
+import OfflineBanner from "@/components/molecules/OfflineBanner";
 import DashboardPage from "@/components/pages/DashboardPage";
 import AddExpensePage from "@/components/pages/AddExpensePage";
 import ExpenseHistoryPage from "@/components/pages/ExpenseHistoryPage";
@@ -9,11 +10,14 @@ import GroupsPage from "@/components/pages/GroupsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 
 function App() {
-return (
-    <BrowserRouter>
+  return (
+<BrowserRouter>
       <div className="min-h-screen bg-background">
+        {/* Offline Status Banner */}
+        <OfflineBanner />
+        
         {/* Main Content */}
-        <main className="pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className="pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-12">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-expense" element={<AddExpensePage />} />

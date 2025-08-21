@@ -32,7 +32,20 @@ const [exchangeRates, setExchangeRates] = useState({});
   const [loading, setLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [showReceiptViewer, setShowReceiptViewer] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   useEffect(() => {
     loadInitialData();
   }, []);
@@ -161,7 +174,7 @@ const [exchangeRates, setExchangeRates] = useState({});
     return true;
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -182,8 +195,26 @@ const [exchangeRates, setExchangeRates] = useState({});
         settled: false
       };
 
-      await expenseService.create(expense);
-      toast.success("Expense added successfully!");
+      if (isOffline || !navigator.onLine) {
+        // Handle offline mode
+        await expenseService.createWithOfflineSupport(expense);
+        toast.success("Expense saved as draft. It will sync when you're back online!");
+      } else {
+        // Normal online operation
+        try {
+          await expenseService.create(expense);
+          toast.success("Expense added successfully!");
+        } catch (err) {
+          if (err.message === "OFFLINE_MODE" || !navigator.onLine) {
+            // Fallback to offline mode if network fails mid-operation
+            await expenseService.createWithOfflineSupport(expense);
+            toast.success("Network error. Expense saved as draft and will sync when connected!");
+          } else {
+            throw err;
+          }
+        }
+      }
+      
       navigate("/");
     } catch (err) {
       toast.error(err.message || "Failed to add expense");
@@ -412,10 +443,18 @@ return (
             ) : (
               <>
                 <ApperIcon name="Plus" size={16} className="mr-2" />
-                Add Expense
+{isOffline ? "Save Draft" : "Add Expense"}
               </>
             )}
           </Button>
+          {isOffline && (
+            <div className="text-center mt-2">
+              <p className="text-xs text-gray-500">
+                <ApperIcon name="WifiOff" size={12} className="inline mr-1" />
+                You're offline. Expense will be saved as draft and synced when connected.
+              </p>
+            </div>
+          )}
         </div>
       </form>
       {/* Receipt Image Viewer */}

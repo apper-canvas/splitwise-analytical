@@ -6,6 +6,19 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class ExpenseService {
   constructor() {
     this.expenses = [...expensesData];
+    this.offlineMode = false;
+  }
+
+  setOfflineMode(isOffline) {
+    this.offlineMode = isOffline;
+  }
+
+  async checkConnection() {
+    if (!navigator.onLine) {
+      this.offlineMode = true;
+      throw new Error("No internet connection. Operating in offline mode.");
+    }
+    this.offlineMode = false;
   }
 
   async getAll() {
@@ -27,21 +40,30 @@ class ExpenseService {
     return this.expenses.filter(e => e.groupId === parseInt(groupId));
   }
 
-  async create(expenseData) {
-    await delay(400);
-    
-    // Find highest existing Id and add 1
-    const maxId = this.expenses.reduce((max, expense) => 
-      Math.max(max, expense.Id), 0);
-    
-    const newExpense = {
-      Id: maxId + 1,
-      ...expenseData,
-      createdAt: new Date().toISOString()
-    };
-    
-    this.expenses.push(newExpense);
-    return { ...newExpense };
+async create(expenseData) {
+    try {
+      await this.checkConnection();
+      await delay(400);
+      
+      // Find highest existing Id and add 1
+      const maxId = this.expenses.reduce((max, expense) => 
+        Math.max(max, expense.Id), 0);
+      
+      const newExpense = {
+        Id: maxId + 1,
+        ...expenseData,
+        createdAt: new Date().toISOString()
+      };
+      
+      this.expenses.push(newExpense);
+      return { ...newExpense };
+    } catch (err) {
+      if (this.offlineMode || !navigator.onLine) {
+        // Handle offline mode - this will be caught by the form
+        throw new Error("OFFLINE_MODE");
+      }
+      throw err;
+    }
   }
 
   async update(Id, updateData) {
@@ -270,6 +292,62 @@ return filtered;
     ].join('\n');
 
 return csvContent;
+  }
+// Offline-specific methods
+  async createOfflineDraft(expenseData) {
+    // This method is used when offline to handle draft creation
+    const { offlineService } = await import('@/services/offlineService');
+    return offlineService.addDraft(expenseData);
+  }
+
+  async syncOfflineDrafts() {
+    // This method handles syncing drafts when back online
+    const { offlineService } = await import('@/services/offlineService');
+    return offlineService.syncDrafts();
+  }
+
+  getOfflineStatus() {
+    return {
+      isOffline: this.offlineMode || !navigator.onLine,
+      hasConnection: navigator.onLine
+    };
+  }
+
+  // Enhanced create method that handles offline scenarios
+  async createWithOfflineSupport(expenseData) {
+    try {
+      return await this.create(expenseData);
+    } catch (err) {
+      if (err.message === "OFFLINE_MODE" || !navigator.onLine) {
+        return await this.createOfflineDraft(expenseData);
+      }
+      throw err;
+    }
+  }
+
+  // Method to check if operating in offline mode
+  isOperatingOffline() {
+    return this.offlineMode || !navigator.onLine;
+  }
+
+  // Method to get pending drafts count
+  async getPendingDraftsCount() {
+    try {
+      const { offlineService } = await import('@/services/offlineService');
+      return offlineService.getDraftCount();
+    } catch {
+      return 0;
+    }
+  }
+
+  // Method to manually trigger sync
+  async forceSyncDrafts() {
+    try {
+      const { offlineService } = await import('@/services/offlineService');
+      return offlineService.forcSync();
+    } catch (err) {
+      throw new Error("Failed to sync drafts: " + err.message);
+    }
   }
 }
 
