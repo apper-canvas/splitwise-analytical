@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* React Toastify Styles */
+@import 'react-toastify/dist/ReactToastify.css';
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F5F5F5;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Toast overrides */
+.Toastify__toast-container {
+  font-family: 'Inter', system-ui, sans-serif;
+  width: 360px;
+}
+
+.Toastify__toast {
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #F44336, #C62828);
+  color: white;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #2196F3, #1565C0);
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00897B;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #004D40;
+}
+
+/* Floating action button pulse animation */
+.floating-pulse {
+  animation: pulseSubtle 2s ease-in-out infinite;
+}
+
+/* Input focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid #00897B;
+  outline-offset: 2px;
+}
+
+/* Custom gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #00897B, #004D40);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Balance card animations */
+.balance-card {
+  transition: all 0.2s ease-out;
+}
+
+.balance-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 137, 123, 0.15);
+}
+
+/* Custom button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #00897B, #004D40);
+  transition: all 0.2s ease-out;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #00695C, #00332C);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, #00E676, #00C853);
+  transition: all 0.2s ease-out;
+}
+
+.btn-accent:hover {
+  background: linear-gradient(135deg, #00C853, #00A642);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+
+/* Receipt scanner overlay */
+.scanner-overlay {
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(0, 137, 123, 0.1) 30%,
+    rgba(0, 137, 123, 0.1) 70%,
+    transparent 70%
+  );
+}
+
+/* Split visualization */
+.split-chart {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+/* Currency selector */
+.currency-option {
+  transition: all 0.15s ease-out;
+}
+
+.currency-option:hover {
+  background: linear-gradient(135deg, #E0F2F1, #B2DFDB);
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .Toastify__toast-container {
+    width: 90vw;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .balance-card {
+    margin: 0 -4px;
+  }
+}
+
+/* Loading skeleton animations */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Floating elements */
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Number counter animation */
+.number-counter {
+  animation: countUp 0.8s ease-out;
+}
+
+/* Expense item hover */
+.expense-item {
+  transition: all 0.2s ease-out;
+}
+
+.expense-item:hover {
+  background: linear-gradient(135deg, rgba(0, 137, 123, 0.02), rgba(0, 77, 64, 0.02));
+  transform: translateX(4px);
+}
