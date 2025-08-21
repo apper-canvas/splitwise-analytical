@@ -7,6 +7,7 @@ import DashboardPage from "@/components/pages/DashboardPage";
 import AddExpensePage from "@/components/pages/AddExpensePage";
 import ExpenseHistoryPage from "@/components/pages/ExpenseHistoryPage";
 import GroupsPage from "@/components/pages/GroupsPage";
+import CreateGroupPage from "@/components/pages/CreateGroupPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 
 function App() {
@@ -21,8 +22,9 @@ function App() {
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-expense" element={<AddExpensePage />} />
-            <Route path="/history" element={<ExpenseHistoryPage />} />
+<Route path="/history" element={<ExpenseHistoryPage />} />
             <Route path="/groups" element={<GroupsPage />} />
+            <Route path="/create-group" element={<CreateGroupPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </main>
