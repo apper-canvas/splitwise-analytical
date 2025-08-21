@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import BottomNavigation from "@/components/organisms/BottomNavigation";
 import DashboardPage from "@/components/pages/DashboardPage";
 import AddExpensePage from "@/components/pages/AddExpensePage";
+import ExpenseHistoryPage from "@/components/pages/ExpenseHistoryPage";
 import GroupsPage from "@/components/pages/GroupsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 
@@ -13,9 +14,10 @@ function App() {
       <div className="min-h-screen bg-background">
         {/* Main Content */}
         <main className="pb-16">
-          <Routes>
+<Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-expense" element={<AddExpensePage />} />
+            <Route path="/history" element={<ExpenseHistoryPage />} />
             <Route path="/groups" element={<GroupsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>

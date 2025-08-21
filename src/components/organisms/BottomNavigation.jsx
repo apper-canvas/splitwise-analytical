@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 
 const BottomNavigation = () => {
-  const navItems = [
+const navItems = [
     { 
       path: "/", 
       icon: "Home", 
@@ -16,6 +16,11 @@ const BottomNavigation = () => {
       icon: "Plus", 
       label: "Add",
       isAction: true 
+    },
+    { 
+      path: "/history", 
+      icon: "Clock", 
+      label: "History" 
     },
     { 
       path: "/groups", 
@@ -30,8 +35,8 @@ const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="grid grid-cols-4 h-16">
+<nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => (
           <NavLink
             key={item.path}

@@ -98,8 +98,87 @@ class ExpenseService {
     
     return this.expenses.filter(expense => {
       const expenseDate = new Date(expense.createdAt);
-      return expenseDate >= start && expenseDate <= end;
+return expenseDate >= start && expenseDate <= end;
     });
+  }
+
+  async getExpensesByCategory(category) {
+    await delay(300);
+    if (!category) return [...this.expenses];
+    return this.expenses.filter(expense => 
+      expense.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  async getExpensesByStatus(settled) {
+    await delay(300);
+    return this.expenses.filter(expense => expense.settled === settled);
+  }
+
+  async getFilteredExpenses(filters = {}) {
+    await delay(400);
+    let filtered = [...this.expenses];
+
+    // Filter by group
+    if (filters.groupId) {
+      filtered = filtered.filter(expense => expense.groupId === parseInt(filters.groupId));
+    }
+
+    // Filter by category
+    if (filters.category) {
+      filtered = filtered.filter(expense => 
+        expense.category.toLowerCase() === filters.category.toLowerCase()
+      );
+    }
+
+    // Filter by status
+    if (filters.settled !== undefined) {
+      filtered = filtered.filter(expense => expense.settled === filters.settled);
+    }
+
+    // Filter by date range
+    if (filters.startDate && filters.endDate) {
+      const start = new Date(filters.startDate);
+      const end = new Date(filters.endDate);
+      filtered = filtered.filter(expense => {
+        const expenseDate = new Date(expense.createdAt);
+        return expenseDate >= start && expenseDate <= end;
+      });
+    }
+
+    // Search by query
+    if (filters.query) {
+      const lowercaseQuery = filters.query.toLowerCase();
+      filtered = filtered.filter(expense =>
+        expense.description.toLowerCase().includes(lowercaseQuery) ||
+        expense.paidBy.toLowerCase().includes(lowercaseQuery)
+      );
+    }
+
+    // Sort results
+    if (filters.sortBy) {
+      filtered.sort((a, b) => {
+        switch (filters.sortBy) {
+          case 'date-desc':
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          case 'date-asc':
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          case 'amount-desc':
+            return b.amount - a.amount;
+          case 'amount-asc':
+            return a.amount - b.amount;
+          case 'description':
+            return a.description.localeCompare(b.description);
+          default:
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+      });
+    } else {
+      // Default sort by date descending
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    return filtered;
   }
 }
 
