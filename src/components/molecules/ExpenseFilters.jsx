@@ -61,9 +61,9 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
     });
   };
 
-  return (
-    <Card className="p-4 bg-gray-50">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+return (
+    <Card className="p-3 sm:p-4 bg-gray-50">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Group Filter */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center">
@@ -73,7 +73,7 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
           <select
             value={filters.groupId}
             onChange={(e) => handleInputChange('groupId', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm min-h-[44px]"
           >
             <option value="">All Groups</option>
             {groups.map((group) => (
@@ -90,10 +90,10 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
             <ApperIcon name="Tag" size={16} className="mr-1" />
             Category
           </label>
-          <select
+<select
             value={filters.category}
             onChange={(e) => handleInputChange('category', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm min-h-[44px]"
           >
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
@@ -109,13 +109,13 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
             <ApperIcon name="CheckCircle" size={16} className="mr-1" />
             Status
           </label>
-          <select
+<select
             value={filters.settled === undefined ? '' : filters.settled.toString()}
             onChange={(e) => {
               const value = e.target.value === '' ? undefined : e.target.value === 'true';
               handleInputChange('settled', value);
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm min-h-[44px]"
           >
             {statusOptions.map((status, index) => (
               <option 
@@ -128,43 +128,43 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
           </select>
         </div>
 
-        {/* Date Range */}
-        <div className="space-y-2 md:col-span-2">
+{/* Date Range */}
+        <div className="space-y-2 sm:col-span-2 lg:col-span-2">
           <label className="text-sm font-medium text-gray-700 flex items-center">
             <ApperIcon name="Calendar" size={16} className="mr-1" />
             Date Range
           </label>
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <Input
               type="date"
               value={filters.startDate}
               onChange={(e) => handleInputChange('startDate', e.target.value)}
               placeholder="Start Date"
-              className="flex-1"
+              className="flex-1 min-h-[44px]"
             />
             <Input
               type="date"
               value={filters.endDate}
               onChange={(e) => handleInputChange('endDate', e.target.value)}
               placeholder="End Date"
-              className="flex-1"
+              className="flex-1 min-h-[44px]"
             />
           </div>
           
-          {/* Date Presets */}
-          <div className="flex flex-wrap gap-1 mt-2">
+{/* Date Presets */}
+          <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
             {[
               { key: 'today', label: 'Today' },
-              { key: 'week', label: 'Last 7 Days' },
-              { key: 'month', label: 'Last Month' },
-              { key: 'quarter', label: 'Last 3 Months' }
+              { key: 'week', label: '7 Days' },
+              { key: 'month', label: '1 Month' },
+              { key: 'quarter', label: '3 Months' }
             ].map((preset) => (
               <Button
                 key={preset.key}
                 variant="ghost"
                 size="sm"
                 onClick={() => getPresetDateRange(preset.key)}
-                className="text-xs px-2 py-1 h-auto"
+                className="text-xs px-2 py-1 h-auto min-h-[32px] touch-manipulation"
               >
                 {preset.label}
               </Button>
@@ -178,10 +178,10 @@ const ExpenseFilters = ({ filters, groups, onChange }) => {
             <ApperIcon name="ArrowUpDown" size={16} className="mr-1" />
             Sort By
           </label>
-          <select
+<select
             value={filters.sortBy}
             onChange={(e) => handleInputChange('sortBy', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm min-h-[44px]"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>

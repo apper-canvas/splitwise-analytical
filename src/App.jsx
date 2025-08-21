@@ -9,12 +9,12 @@ import GroupsPage from "@/components/pages/GroupsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 
 function App() {
-  return (
+return (
     <BrowserRouter>
       <div className="min-h-screen bg-background">
         {/* Main Content */}
-        <main className="pb-16">
-<Routes>
+        <main className="pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-expense" element={<AddExpensePage />} />
             <Route path="/history" element={<ExpenseHistoryPage />} />

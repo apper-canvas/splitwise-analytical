@@ -42,22 +42,22 @@ const GroupCard = ({
   const balanceStatus = getBalanceStatus();
   const canSettleUp = userBalance && userBalance.netBalance !== 0;
 
-  return (
+return (
     <Card 
       className={cn(
-        "cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-[1.02]",
+        "cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-[1.01] sm:hover:scale-[1.02]",
         className
       )}
       onClick={onClick}
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Group Header */}
         <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 font-display">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 font-display truncate">
               {group.name}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               {group.members.length} members • {group.type}
             </p>
           </div>
@@ -75,29 +75,28 @@ const GroupCard = ({
             {balanceStatus.text}
           </Badge>
         </div>
-
-        {/* Member Avatars */}
+{/* Member Avatars */}
         <div className="flex items-center justify-between">
-          <div className="flex -space-x-2">
-            {group.members.slice(0, 5).map((member, index) => (
+          <div className="flex -space-x-1.5 sm:-space-x-2">
+            {group.members.slice(0, 4).map((member, index) => (
               <Avatar 
                 key={index}
-                size="sm"
+                size="xs"
                 alt={member.name}
                 src={member.avatar}
-                className="ring-2 ring-white"
+                className="ring-2 ring-white w-7 h-7 sm:w-8 sm:h-8"
               >
                 {member.name.charAt(0)}
               </Avatar>
             ))}
-            {group.members.length > 5 && (
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 ring-2 ring-white">
-                +{group.members.length - 5}
+            {group.members.length > 4 && (
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 ring-2 ring-white">
+                +{group.members.length - 4}
               </div>
             )}
           </div>
 
-          {canSettleUp && (
+{canSettleUp && (
             <Button
               variant="accent"
               size="sm"
@@ -105,10 +104,11 @@ const GroupCard = ({
                 e.stopPropagation();
                 onSettleUp(group.Id, userBalance);
               }}
-              className="flex items-center space-x-1"
+              className="flex items-center space-x-1 min-h-[36px] text-xs px-2 sm:px-3"
             >
-              <ApperIcon name="CreditCard" size={14} />
-              <span>Settle Up</span>
+              <ApperIcon name="CreditCard" size={12} className="sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">Settle Up</span>
+              <span className="sm:hidden">Settle</span>
             </Button>
           )}
         </div>

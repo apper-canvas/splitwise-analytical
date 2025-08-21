@@ -201,29 +201,29 @@ const [exchangeRates, setExchangeRates] = useState({});
     { id: "utilities", name: "Utilities", icon: "Zap" }
   ];
 
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
+return (
+    <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="text-center py-6">
-        <h1 className="text-3xl font-bold text-gray-900 font-display mb-2">
+      <div className="text-center py-4 sm:py-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 font-display mb-2">
           Add New Expense
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600 px-4">
           Split costs fairly with your friends and family
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Receipt Scanner */}
         <Card className="relative">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ApperIcon name="Camera" size={24} className="text-primary" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+<ApperIcon name="Camera" size={20} className="text-primary sm:w-6 sm:h-6" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
               Scan Receipt (AI Powered)
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4 px-4">
               Upload a receipt and let AI extract the details automatically
             </p>
             
@@ -238,6 +238,8 @@ const [exchangeRates, setExchangeRates] = useState({});
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
+                className="min-h-[44px] px-4 py-2"
                 className="relative"
                 disabled={isScanning}
               >
@@ -255,17 +257,17 @@ const [exchangeRates, setExchangeRates] = useState({});
               </Button>
             </label>
 
-            {formData.receiptImage && (
+{formData.receiptImage && (
               <div className="mt-4">
                 <div className="relative group cursor-pointer" onClick={() => setShowReceiptViewer(true)}>
                   <img
                     src={formData.receiptImage}
                     alt="Uploaded receipt"
-                    className="max-w-48 max-h-32 object-cover rounded-lg mx-auto border-2 border-gray-200 transition-all duration-200 group-hover:border-primary group-hover:shadow-lg"
+                    className="max-w-32 max-h-24 sm:max-w-48 sm:max-h-32 object-cover rounded-lg mx-auto border-2 border-gray-200 transition-all duration-200 group-hover:border-primary group-hover:shadow-lg"
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-all duration-200 flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
-                      <ApperIcon name="ZoomIn" size={16} className="text-primary" />
+                      <ApperIcon name="ZoomIn" size={14} className="text-primary sm:w-4 sm:h-4" />
                     </div>
                   </div>
                 </div>
@@ -278,22 +280,23 @@ const [exchangeRates, setExchangeRates] = useState({});
         </Card>
 
         {/* Basic Details */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+<Card>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
             Expense Details
           </h3>
           
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-6">
             <Input
               label="Description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               placeholder="What was this expense for?"
               required
+              className="min-h-[44px]"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
+<Input
                 label="Amount"
                 type="number"
                 step="0.01"
@@ -301,6 +304,7 @@ const [exchangeRates, setExchangeRates] = useState({});
                 onChange={(e) => handleInputChange("amount", e.target.value)}
                 placeholder="0.00"
                 required
+                className="min-h-[44px]"
               />
               
               <div>
@@ -315,30 +319,30 @@ const [exchangeRates, setExchangeRates] = useState({});
               </div>
             </div>
 
-            {/* Category Selection */}
+{/* Category Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
                 Category
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                 {categories.map((category) => (
                   <button
                     key={category.id}
                     type="button"
                     onClick={() => handleInputChange("category", category.id)}
-                    className={`p-3 rounded-xl border-2 transition-all duration-200 ${
+                    className={`p-2 sm:p-3 rounded-xl border-2 transition-all duration-200 min-h-[56px] ${
                       formData.category === category.id
                         ? "border-primary bg-gradient-to-br from-primary/5 to-primary/10"
                         : "border-gray-200 hover:border-gray-300 bg-white"
                     }`}
                   >
-                    <div className="flex flex-col items-center space-y-2">
+                    <div className="flex flex-col items-center space-y-1 sm:space-y-2">
                       <ApperIcon 
                         name={category.icon} 
-                        size={20} 
-                        className={formData.category === category.id ? "text-primary" : "text-gray-600"} 
+                        size={18} 
+                        className={`${formData.category === category.id ? "text-primary" : "text-gray-600"} sm:w-5 sm:h-5`} 
                       />
-                      <span className="text-xs font-medium">{category.name}</span>
+                      <span className="text-xs font-medium text-center leading-tight">{category.name}</span>
                     </div>
                   </button>
                 ))}
@@ -350,10 +354,10 @@ const [exchangeRates, setExchangeRates] = useState({});
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Group
               </label>
-              <select
+<select
                 value={formData.groupId}
                 onChange={(e) => handleInputChange("groupId", e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 min-h-[44px]"
                 required
               >
                 <option value="">Select a group</option>
@@ -384,23 +388,23 @@ const [exchangeRates, setExchangeRates] = useState({});
           </Card>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex space-x-4">
+{/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pb-4">
           <Button
             type="button"
             variant="secondary"
             onClick={() => navigate("/")}
-            className="flex-1"
+            className="flex-1 min-h-[44px] text-sm"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             variant="primary"
-            className="flex-1"
+            className="flex-1 min-h-[44px] text-sm"
             disabled={loading}
           >
-{loading ? (
+            {loading ? (
               <>
                 <ApperIcon name="Loader" size={16} className="mr-2 animate-spin" />
                 Adding...

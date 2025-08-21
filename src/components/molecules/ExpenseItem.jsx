@@ -31,47 +31,47 @@ const ExpenseItem = ({
     return "Split";
   };
 
-  return (
+return (
     <div 
       className={cn(
-        "expense-item bg-white rounded-2xl p-4 shadow-lg border border-gray-100",
-        "cursor-pointer transition-all duration-200 ease-out",
+        "expense-item bg-white rounded-2xl p-3 sm:p-4 shadow-lg border border-gray-100",
+        "cursor-pointer transition-all duration-200 ease-out touch-manipulation",
         className
       )}
       onClick={onClick}
     >
-      <div className="flex items-start space-x-4">
+      <div className="flex items-start space-x-3 sm:space-x-4">
         {/* Expense Icon/Category */}
-        <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
           <ApperIcon 
             name={expense.category === "food" ? "Utensils" : 
                   expense.category === "transport" ? "Car" :
                   expense.category === "entertainment" ? "Film" :
                   "Receipt"} 
-            size={20} 
-            className="text-primary" 
+            size={18} 
+            className="text-primary sm:w-5 sm:h-5" 
           />
         </div>
 
-        {/* Expense Details */}
+{/* Expense Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2">
-            <div>
-              <h4 className="font-semibold text-gray-900 font-display truncate">
+            <div className="flex-1 min-w-0 pr-2">
+              <h4 className="font-semibold text-gray-900 font-display truncate text-sm sm:text-base">
                 {expense.description}
               </h4>
               {showPaidBy && (
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Paid by <span className="font-medium">{expense.paidBy}</span>
                 </p>
               )}
             </div>
-            <div className="text-right flex-shrink-0 ml-4">
-              <p className="text-lg font-bold text-gray-900 font-display">
+            <div className="text-right flex-shrink-0">
+              <p className="text-base sm:text-lg font-bold text-gray-900 font-display">
                 {formatAmount(expense.amount, expense.currency)}
               </p>
               <p className="text-xs text-gray-500">
-                {format(new Date(expense.createdAt), "MMM dd, yyyy")}
+                {format(new Date(expense.createdAt), "MMM dd")}
               </p>
             </div>
           </div>
@@ -93,20 +93,19 @@ const ExpenseItem = ({
                 </Badge>
               )}
             </div>
-
-            {/* Member Avatars */}
-            <div className="flex -space-x-2">
+{/* Member Avatars */}
+            <div className="flex -space-x-1 sm:-space-x-2">
               {expense.splitBetween.slice(0, 3).map((member, index) => (
                 <Avatar 
                   key={index}
                   size="xs"
                   alt={member.name}
                   src={member.avatar}
-                  className="ring-2 ring-white"
+                  className="ring-1 sm:ring-2 ring-white w-5 h-5 sm:w-6 sm:h-6"
                 />
               ))}
               {expense.splitBetween.length > 3 && (
-                <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 ring-2 ring-white">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 ring-1 sm:ring-2 ring-white">
                   +{expense.splitBetween.length - 3}
                 </div>
               )}

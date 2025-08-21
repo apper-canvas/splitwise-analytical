@@ -34,9 +34,9 @@ const navItems = [
     }
   ];
 
-  return (
-<nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="grid grid-cols-5 h-16">
+return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 pb-safe">
+      <div className="grid grid-cols-5 h-16 sm:h-18">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -44,7 +44,7 @@ const navItems = [
             end={item.exact}
             className={({ isActive }) =>
               cn(
-                "flex flex-col items-center justify-center space-y-1 transition-all duration-200",
+                "flex flex-col items-center justify-center space-y-1 transition-all duration-200 min-h-[44px] px-1",
                 item.isAction
                   ? "relative"
                   : isActive
@@ -55,25 +55,25 @@ const navItems = [
           >
             {({ isActive }) => (
               <>
-                {item.isAction ? (
-                  <div className="w-12 h-12 bg-gradient-to-r from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg -mt-2">
-                    <ApperIcon name={item.icon} size={24} className="text-white" />
+{item.isAction ? (
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-r from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg -mt-1 sm:-mt-2">
+                    <ApperIcon name={item.icon} size={22} className="text-white sm:w-6 sm:h-6" />
                   </div>
                 ) : (
                   <>
                     <div className={cn(
-                      "w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200",
+                      "w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full transition-all duration-200 touch-manipulation",
                       isActive && "bg-primary/10"
                     )}>
                       <ApperIcon 
                         name={item.icon} 
-                        size={20} 
-                        className={isActive ? "text-primary" : "text-gray-500"}
+                        size={18} 
+                        className={`${isActive ? "text-primary" : "text-gray-500"} sm:w-5 sm:h-5`}
                       />
                     </div>
                     <span className={cn(
-                      "text-xs font-medium",
-                      isActive ? "text-primary" : "text-gray-500"
+                      "text-xs font-medium leading-tight",
+isActive ? "text-primary" : "text-gray-500"
                     )}>
                       {item.label}
                     </span>

@@ -109,18 +109,18 @@ const ExpenseHistoryList = () => {
     return <Error message={error} onRetry={loadInitialData} />;
   }
 
-  return (
-    <div className="space-y-6">
+return (
+    <div className="space-y-4 sm:space-y-6">
       {/* Search and Filter Controls */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Search Bar */}
         <div className="relative">
           <Input
             type="text"
-            placeholder="Search expenses by description or payer..."
+            placeholder="Search expenses..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4"
+            className="pl-10 pr-4 min-h-[44px] text-sm"
           />
           <ApperIcon 
             name="Search" 
@@ -129,34 +129,33 @@ const ExpenseHistoryList = () => {
           />
         </div>
 
-        {/* Filter Toggle and Controls */}
-        <div className="flex items-center justify-between">
+{/* Filter Toggle and Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0">
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex items-center space-x-2",
+              "flex items-center justify-center space-x-2 min-h-[44px]",
               hasActiveFilters() && "border-primary text-primary"
             )}
           >
             <ApperIcon name="Filter" size={16} />
             <span>Filters</span>
             {hasActiveFilters() && (
-              <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">
+              <span className="bg-primary text-white text-xs px-2 py-1 rounded-full ml-1">
                 Active
               </span>
             )}
           </Button>
-
-          {hasActiveFilters() && (
+{hasActiveFilters() && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClearFilters}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-gray-600 hover:text-gray-800 min-h-[44px] justify-center"
             >
               <ApperIcon name="X" size={16} />
-              Clear
+              <span className="sm:inline hidden ml-1">Clear</span>
             </Button>
           )}
         </div>
@@ -171,12 +170,12 @@ const ExpenseHistoryList = () => {
         )}
       </div>
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
+{/* Results Summary */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs sm:text-sm text-gray-600 space-y-1 sm:space-y-0 bg-gray-50 p-3 rounded-lg">
         <span>
           {expenses.length} expense{expenses.length !== 1 ? 's' : ''} found
         </span>
-        <span>
+        <span className="font-medium">
           Total: ${expenses.reduce((sum, exp) => sum + exp.amount, 0).toFixed(2)}
         </span>
       </div>
@@ -190,18 +189,18 @@ const ExpenseHistoryList = () => {
             "Try adjusting your filters to see more results." :
             "Start by adding your first expense!"
           }
-          action={
+action={
             <Button
               onClick={() => window.location.href = '/add-expense'}
-              className="mt-4"
+              className="mt-4 min-h-[44px]"
             >
-              <ApperIcon name="Plus" size={16} />
+              <ApperIcon name="Plus" size={16} className="mr-2" />
               Add Expense
             </Button>
           }
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {expenses.map((expense) => (
             <ExpenseItem
               key={expense.Id}
