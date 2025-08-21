@@ -1,94 +1,88 @@
 import currenciesData from "@/services/mockData/currencies.json";
-
-// Simple delay function to simulate API calls
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 class CurrencyService {
   constructor() {
-    this.exchangeRates = { ...currenciesData };
-    this.lastUpdated = new Date();
+    this.exchangeRates = {};
+    this.lastUpdated = null;
+    this.supportedCurrencies = currenciesData;
   }
 
   async getExchangeRates() {
-    await delay(200);
+    await delay(500);
     
-    // Simulate rate fluctuation (small random changes)
-    const fluctuatedRates = { ...this.exchangeRates };
-    Object.keys(fluctuatedRates).forEach(currency => {
-      if (currency !== "USD") {
-        const rate = fluctuatedRates[currency];
-        const fluctuation = (Math.random() - 0.5) * 0.02; // ±1% fluctuation
-        fluctuatedRates[currency] = Math.max(0.01, rate + (rate * fluctuation));
-      }
-    });
-    
-    this.exchangeRates = fluctuatedRates;
+    // Mock exchange rates (in real app, fetch from API)
+    const rates = {
+      USD: 1,
+      EUR: 0.85,
+      GBP: 0.73,
+      JPY: 110,
+      CAD: 1.25,
+      AUD: 1.35,
+      CHF: 0.92,
+      CNY: 6.45,
+      INR: 74.5,
+      BRL: 5.2
+    };
+
+    this.exchangeRates = rates;
     this.lastUpdated = new Date();
-    
-    return { ...this.exchangeRates };
+    return rates;
   }
 
   async convertCurrency(amount, fromCurrency, toCurrency) {
-    await delay(150);
-    
-    if (fromCurrency === toCurrency) {
-      return amount;
+    if (!this.exchangeRates || Object.keys(this.exchangeRates).length === 0) {
+      await this.getExchangeRates();
     }
+
+    const fromRate = this.exchangeRates[fromCurrency] || 1;
+    const toRate = this.exchangeRates[toCurrency] || 1;
     
-    const rates = await this.getExchangeRates();
+    const usdAmount = amount / fromRate;
+    const convertedAmount = usdAmount * toRate;
     
-    // Convert to USD first, then to target currency
-    const usdAmount = fromCurrency === "USD" ? amount : amount / rates[fromCurrency];
-    const convertedAmount = toCurrency === "USD" ? usdAmount : usdAmount * rates[toCurrency];
-    
-    return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
+    return Math.round(convertedAmount * 100) / 100;
   }
 
   async getSupportedCurrencies() {
-    await delay(100);
-    
-    const currencyDetails = {
-      USD: { name: "US Dollar", symbol: "$", flag: "🇺🇸" },
-      EUR: { name: "Euro", symbol: "€", flag: "🇪🇺" },
-      GBP: { name: "British Pound", symbol: "£", flag: "🇬🇧" },
-      INR: { name: "Indian Rupee", symbol: "₹", flag: "🇮🇳" },
-      JPY: { name: "Japanese Yen", symbol: "¥", flag: "🇯🇵" },
-      CAD: { name: "Canadian Dollar", symbol: "C$", flag: "🇨🇦" },
-      AUD: { name: "Australian Dollar", symbol: "A$", flag: "🇦🇺" },
-      CHF: { name: "Swiss Franc", symbol: "CHF", flag: "🇨🇭" },
-      CNY: { name: "Chinese Yuan", symbol: "¥", flag: "🇨🇳" },
-      SGD: { name: "Singapore Dollar", symbol: "S$", flag: "🇸🇬" }
-    };
-    
-    return Object.keys(this.exchangeRates).map(code => ({
-      code,
-      ...currencyDetails[code],
-      rate: this.exchangeRates[code]
-    }));
+    await delay(200);
+    return this.supportedCurrencies;
+  }
+
+  async getAll() {
+    try {
+      return await this.getSupportedCurrencies();
+    } catch (error) {
+      console.error('Failed to get currencies:', error);
+      throw error;
+    }
   }
 
   async getHistoricalRates(currency, days = 7) {
-    await delay(300);
+    await delay(800);
     
-    // Simulate historical data
-    const historicalRates = [];
-    const currentRate = this.exchangeRates[currency];
+    // Mock historical data
+    const rates = [];
+    const today = new Date();
     
     for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
+      const date = new Date(today);
       date.setDate(date.getDate() - i);
       
-      // Generate simulated historical rate with some variation
-      const variation = (Math.random() - 0.5) * 0.05; // ±2.5% variation
-      const rate = Math.max(0.01, currentRate + (currentRate * variation));
+      // Generate mock rate with some variation
+      const baseRate = this.exchangeRates[currency] || 1;
+      const variation = (Math.random() - 0.5) * 0.1; // ±5% variation
+      const rate = baseRate + (baseRate * variation);
       
-      historicalRates.push({
-        date: date.toISOString().split("T")[0],
+      rates.push({
+        date: date.toISOString().split('T')[0],
         rate: Math.round(rate * 10000) / 10000
       });
     }
     
-    return historicalRates;
+    return rates;
   }
 
   getLastUpdated() {
@@ -96,9 +90,21 @@ class CurrencyService {
   }
 
   async refreshRates() {
-    await delay(500);
-    return this.getExchangeRates();
+    return await this.getExchangeRates();
   }
 }
-
+// Create and export service instance
 export const currencyService = new CurrencyService();
+
+// Export individual methods for convenience
+export const {
+  getAll,
+  getExchangeRates,
+  convertCurrency,
+  getSupportedCurrencies,
+  getHistoricalRates,
+  getLastUpdated,
+  refreshRates
+} = currencyService;
+// Default export
+export default currencyService;
