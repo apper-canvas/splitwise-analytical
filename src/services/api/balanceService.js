@@ -1,12 +1,14 @@
 import balancesData from "@/services/mockData/balances.json";
-// Simple delay function to simulate API calls
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Utility function to simulate API delay
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 class BalanceService {
   constructor() {
     this.balances = [...balancesData];
   }
-
   async getCurrentUserBalance() {
     await delay(250);
     const userBalance = this.balances.find(b => b.userId === "current-user");
@@ -196,11 +198,11 @@ class BalanceService {
       totalContributed: contributionHistory.reduce((sum, record) => sum + record.contributed, 0),
       totalReceived: contributionHistory.reduce((sum, record) => sum + record.received, 0),
       netContribution: contributionHistory.reduce((sum, record) => sum + (record.contributed - record.received), 0)
-    };
+};
   }
 
-  async getContributionHistory(months = 6) {
-    await delay(350);
+  async getContributionHistory(months = 12) {
+    await delay(300);
     
     // Generate contribution history data based on current balances and mock historical data
     const currentDate = new Date();
@@ -394,6 +396,11 @@ class BalanceService {
       });
     }
     
-    return recommendations;
+return recommendations;
   }
 }
+
+// Create and export service instance
+const balanceService = new BalanceService();
+export { balanceService };
+export default balanceService;
