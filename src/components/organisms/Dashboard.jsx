@@ -11,13 +11,15 @@ import Loading from "@/components/ui/Loading";
 import BalanceCard from "@/components/molecules/BalanceCard";
 import ExpenseItem from "@/components/molecules/ExpenseItem";
 import Button from "@/components/atoms/Button";
+import FairnessInsights from "@/components/organisms/FairnessInsights";
 
 const Dashboard = () => {
   const [recentExpenses, setRecentExpenses] = useState([]);
-  const [userBalance, setUserBalance] = useState(null);
+const [userBalance, setUserBalance] = useState(null);
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showFairnessInsights, setShowFairnessInsights] = useState(false);
   const navigate = useNavigate();
 
 const loadDashboardData = async () => {
@@ -296,16 +298,47 @@ variant="accent"
                 {netBalance < 0 && " Don't forget to settle up with your friends."}
                 {netBalance === 0 && " All your accounts are balanced!"}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/insights")}
-                className="border-blue-300 text-blue-700 hover:bg-blue-100 min-h-[36px] text-xs sm:text-sm"
-              >
-                View Detailed Insights
-              </Button>
+<div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFairnessInsights(!showFairnessInsights)}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100 min-h-[36px] text-xs sm:text-sm"
+                >
+                  <ApperIcon name="BarChart3" size={14} className="mr-1" />
+                  Fairness Insights
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/insights")}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100 min-h-[36px] text-xs sm:text-sm"
+                >
+                  View All Insights
+                </Button>
+              </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Fairness Insights Expanded */}
+      {showFairnessInsights && recentExpenses.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-bold text-blue-900">
+              Contribution Fairness Analysis
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFairnessInsights(false)}
+              className="text-blue-700 hover:bg-blue-100"
+            >
+              <ApperIcon name="X" size={16} />
+            </Button>
+          </div>
+          <FairnessInsights />
         </div>
       )}
     </div>
