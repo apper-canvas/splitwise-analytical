@@ -177,8 +177,6 @@ return expenseDate >= start && expenseDate <= end;
       // Default sort by date descending
       filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-
-    return filtered;
 return filtered;
   }
 
