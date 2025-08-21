@@ -22,25 +22,64 @@ const ExpenseDetailPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Validate ID parameter before attempting to load
+    if (!id) {
+      console.error('No expense ID provided in URL');
+      setError('Invalid expense ID. Please check the URL.');
+      setLoading(false);
+      return;
+    }
+
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId) || numericId <= 0) {
+      console.error('Invalid expense ID format:', id);
+      setError('Invalid expense ID format. Please check the URL.');
+      setLoading(false);
+      return;
+    }
+
     loadExpenseDetails();
   }, [id]);
 
-  const loadExpenseDetails = async () => {
+const loadExpenseDetails = async () => {
     try {
       setLoading(true);
-      const expenseData = await expenseService.getById(parseInt(id));
-      setExpense(expenseData);
-
-      if (expenseData?.groupId) {
-        const groupData = await groupService.getById(expenseData.groupId);
-        setGroup(groupData);
+      setError(null);
+      
+      console.log('Loading expense details for ID:', id);
+      
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId) || numericId <= 0) {
+        throw new Error(`Invalid expense ID: ${id}`);
       }
 
-      setError(null);
+      const expenseData = await expenseService.getById(numericId);
+      console.log('Expense data loaded:', expenseData);
+      
+      if (!expenseData) {
+        throw new Error(`Expense not found with ID: ${id}`);
+      }
+
+      setExpense(expenseData);
+
+      // Load group data if groupId exists
+      if (expenseData?.groupId) {
+        try {
+          console.log('Loading group data for groupId:', expenseData.groupId);
+          const groupData = await groupService.getById(expenseData.groupId);
+          console.log('Group data loaded:', groupData);
+          setGroup(groupData);
+        } catch (groupErr) {
+          console.warn('Failed to load group data:', groupErr);
+          // Don't fail the entire operation if group loading fails
+        }
+      }
+
     } catch (err) {
-      console.error('Error loading expense:', err);
-      setError('Failed to load expense details. Please try again.');
-      toast.error('Failed to load expense details');
+      console.error('Error loading expense details:', err);
+      const errorMessage = err.message || 'Failed to load expense details. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -94,22 +133,46 @@ const ExpenseDetailPage = () => {
     return `Split ${totalParticipants} ways`;
   };
 
-  if (loading) {
-    return <Loading message="Loading expense details..." />;
+if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <Loading message="Loading expense details..." />
+        <p className="text-sm text-gray-500">Loading expense ID: {id}</p>
+      </div>
+    );
   }
 
-  if (error || !expense) {
+  if (error) {
     return (
-      <Error 
-        message={error || 'Expense not found'} 
-        onRetry={loadExpenseDetails}
-        action={
-          <Button onClick={handleBack} variant="outline" className="mt-4">
-            <ApperIcon name="ArrowLeft" size={16} className="mr-2" />
-            Back to History
-          </Button>
-        }
-      />
+      <div className="max-w-2xl mx-auto">
+        <Error 
+          message={error} 
+          onRetry={loadExpenseDetails}
+          action={
+            <Button onClick={handleBack} variant="outline" className="mt-4">
+              <ApperIcon name="ArrowLeft" size={16} className="mr-2" />
+              Back to History
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  if (!expense) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Error 
+          message="Expense not found" 
+          onRetry={loadExpenseDetails}
+          action={
+            <Button onClick={handleBack} variant="outline" className="mt-4">
+              <ApperIcon name="ArrowLeft" size={16} className="mr-2" />
+              Back to History
+            </Button>
+          }
+        />
+      </div>
     );
   }
 
@@ -150,17 +213,17 @@ const ExpenseDetailPage = () => {
 
       {/* Main Expense Card */}
       <Card className="p-6">
-        <div className="space-y-6">
+<div className="space-y-6">
           {/* Amount and Status */}
           <div className="text-center border-b pb-6">
             <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              {formatAmount(expense.amount, expense.currency)}
+              {formatAmount(expense?.amount || 0, expense?.currency || 'USD')}
             </div>
             <div className="flex items-center justify-center space-x-3">
-              <Badge variant={expense.settled ? 'success' : 'warning'}>
-                {expense.settled ? 'Settled' : 'Pending'}
+              <Badge variant={expense?.settled ? 'success' : 'warning'}>
+                {expense?.settled ? 'Settled' : 'Pending'}
               </Badge>
-              {expense.category && (
+              {expense?.category && (
                 <Badge variant="outline">
                   {expense.category}
                 </Badge>
@@ -168,12 +231,12 @@ const ExpenseDetailPage = () => {
             </div>
           </div>
 
-          {/* Description */}
+{/* Description */}
           <div>
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-              {expense.description}
+              {expense?.description || 'Unnamed Expense'}
             </h2>
-            {expense.notes && (
+            {expense?.notes && (
               <p className="text-gray-600">{expense.notes}</p>
             )}
           </div>
@@ -183,18 +246,18 @@ const ExpenseDetailPage = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <ApperIcon name="Calendar" size={16} className="text-gray-400" />
-                <span className="text-gray-600">Date:</span>
+<span className="text-gray-600">Date:</span>
                 <span className="font-medium">
-                  {format(new Date(expense.date), 'PPP')}
+                  {expense?.date ? format(new Date(expense.date), 'PPP') : 'No date'}
                 </span>
               </div>
               
               <div className="flex items-center space-x-3">
                 <ApperIcon name="User" size={16} className="text-gray-400" />
-                <span className="text-gray-600">Paid by:</span>
+<span className="text-gray-600">Paid by:</span>
                 <div className="flex items-center space-x-2">
-                  <Avatar name={expense.paidBy} size="sm" />
-                  <span className="font-medium">{expense.paidBy}</span>
+                  <Avatar name={expense?.paidBy || 'Unknown'} size="sm" />
+                  <span className="font-medium">{expense?.paidBy || 'Unknown'}</span>
                 </div>
               </div>
 
@@ -210,8 +273,8 @@ const ExpenseDetailPage = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <ApperIcon name="DollarSign" size={16} className="text-gray-400" />
-                <span className="text-gray-600">Currency:</span>
-                <span className="font-medium">{expense.currency || 'USD'}</span>
+<span className="text-gray-600">Currency:</span>
+                <span className="font-medium">{expense?.currency || 'USD'}</span>
               </div>
 
               <div className="flex items-center space-x-3">
@@ -236,43 +299,43 @@ const ExpenseDetailPage = () => {
             </div>
           </div>
 
-          {/* Split Details */}
-          {expense.splitWith && expense.splitWith.length > 0 && (
+{/* Split Details */}
+          {expense?.splitWith && expense.splitWith.length > 0 && (
             <div className="border-t pt-6">
               <h3 className="font-semibold text-gray-900 mb-4">Split Details</h3>
-              <div className="space-y-3">
+<div className="space-y-3">
                 {expense.splitWith.map((person, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <Avatar name={person.name} size="sm" />
-                      <span className="font-medium">{person.name}</span>
+                      <Avatar name={person?.name || 'Unknown'} size="sm" />
+                      <span className="font-medium">{person?.name || 'Unknown'}</span>
                     </div>
                     <span className="font-medium">
-                      {formatAmount(person.amount, expense.currency)}
+                      {formatAmount(person?.amount || 0, expense?.currency || 'USD')}
                     </span>
                   </div>
                 ))}
-                
                 {/* Payer's share */}
-                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+<div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
                   <div className="flex items-center space-x-3">
-                    <Avatar name={expense.paidBy} size="sm" />
-                    <span className="font-medium">{expense.paidBy}</span>
+                    <Avatar name={expense?.paidBy || 'Unknown'} size="sm" />
+                    <span className="font-medium">{expense?.paidBy || 'Unknown'}</span>
                     <Badge variant="outline" size="sm">Payer</Badge>
                   </div>
                   <span className="font-medium">
-                    {formatAmount(expense.amount - (expense.splitWith?.reduce((sum, p) => sum + p.amount, 0) || 0), expense.currency)}
+                    {formatAmount((expense?.amount || 0) - (expense?.splitWith?.reduce((sum, p) => sum + (p?.amount || 0), 0) || 0), expense?.currency || 'USD')}
                   </span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Actions */}
-          {!expense.settled && (
+{/* Actions */}
+          {!expense?.settled && (
             <div className="border-t pt-6">
-              <Button
+<Button
                 onClick={handleSettle}
+                disabled={!expense?.Id}
                 className="w-full sm:w-auto"
                 variant="success"
               >
