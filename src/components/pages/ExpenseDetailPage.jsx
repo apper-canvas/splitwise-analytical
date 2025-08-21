@@ -126,11 +126,17 @@ const loadExpenseDetails = async () => {
     }).format(amount);
   };
 
-  const getSplitText = (expense) => {
-    if (!expense?.splitWith?.length) return 'No split';
+const getSplitText = (expense) => {
+    if (!expense?.splitBetween?.length) return 'No split';
     
-    const totalParticipants = expense.splitWith.length + 1; // +1 for payer
-    return `Split ${totalParticipants} ways`;
+    if (expense.splitMethod === "equal") {
+      return `Split ${expense.splitBetween.length} ways`;
+    } else if (expense.splitMethod === "custom") {
+      return "Custom split";
+    } else if (expense.splitMethod === "percentage") {
+      return "Percentage split";
+    }
+    return `Split ${expense.splitBetween.length} ways`;
   };
 
 if (loading) {
@@ -245,10 +251,10 @@ if (loading) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <ApperIcon name="Calendar" size={16} className="text-gray-400" />
-<span className="text-gray-600">Date:</span>
+<ApperIcon name="Calendar" size={16} className="text-gray-400" />
+                <span className="text-gray-600">Date:</span>
                 <span className="font-medium">
-                  {expense?.date ? format(new Date(expense.date), 'PPP') : 'No date'}
+                  {expense?.createdAt ? format(new Date(expense.createdAt), 'PPP') : 'No date'}
                 </span>
               </div>
               
@@ -300,30 +306,35 @@ if (loading) {
           </div>
 
 {/* Split Details */}
-          {expense?.splitWith && expense.splitWith.length > 0 && (
+          {expense?.splitBetween && expense.splitBetween.length > 0 && (
             <div className="border-t pt-6">
               <h3 className="font-semibold text-gray-900 mb-4">Split Details</h3>
-<div className="space-y-3">
-                {expense.splitWith.map((person, index) => (
+              <div className="space-y-3">
+                {expense.splitBetween.map((person, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Avatar name={person?.name || 'Unknown'} size="sm" />
                       <span className="font-medium">{person?.name || 'Unknown'}</span>
                     </div>
                     <span className="font-medium">
-                      {formatAmount(person?.amount || 0, expense?.currency || 'USD')}
+                      {formatAmount(person?.amount || (expense?.amount || 0) / (expense.splitBetween.length + 1), expense?.currency || 'USD')}
                     </span>
                   </div>
                 ))}
                 {/* Payer's share */}
-<div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
                   <div className="flex items-center space-x-3">
                     <Avatar name={expense?.paidBy || 'Unknown'} size="sm" />
                     <span className="font-medium">{expense?.paidBy || 'Unknown'}</span>
                     <Badge variant="outline" size="sm">Payer</Badge>
                   </div>
                   <span className="font-medium">
-                    {formatAmount((expense?.amount || 0) - (expense?.splitWith?.reduce((sum, p) => sum + (p?.amount || 0), 0) || 0), expense?.currency || 'USD')}
+                    {formatAmount(
+                      expense.splitMethod === "equal" 
+                        ? (expense?.amount || 0) / (expense.splitBetween.length + 1)
+                        : (expense?.amount || 0) - (expense?.splitBetween?.reduce((sum, p) => sum + (p?.amount || 0), 0) || 0), 
+                      expense?.currency || 'USD'
+                    )}
                   </span>
                 </div>
               </div>
