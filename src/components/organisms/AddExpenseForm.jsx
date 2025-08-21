@@ -246,14 +246,14 @@ const [exchangeRates, setExchangeRates] = useState({});
                     <ApperIcon name="Loader" size={16} className="mr-2 animate-spin" />
                     Scanning...
                   </>
-                ) : (
+) : (
                   <>
                     <ApperIcon name="Upload" size={16} className="mr-2" />
                     Upload Receipt
                   </>
                 )}
               </Button>
-</label>
+            </label>
 
             {formData.receiptImage && (
               <div className="mt-4">
@@ -410,9 +410,9 @@ const [exchangeRates, setExchangeRates] = useState({});
                 <ApperIcon name="Plus" size={16} className="mr-2" />
                 Add Expense
               </>
-            )}
+)}
           </Button>
-</div>
+        </div>
       </form>
       {/* Receipt Image Viewer */}
       <ReceiptImageViewer
