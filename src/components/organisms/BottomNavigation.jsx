@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
+import LogoutButton from "@/components/molecules/LogoutButton";
 
 const BottomNavigation = () => {
 const navItems = [
@@ -83,6 +84,11 @@ isActive ? "text-primary" : "text-gray-500"
             )}
           </NavLink>
         ))}
+        
+        {/* Logout Button */}
+        <div className="fixed top-4 right-4 z-50">
+          <LogoutButton />
+        </div>
       </div>
     </nav>
   );

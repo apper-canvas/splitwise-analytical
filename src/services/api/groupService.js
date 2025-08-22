@@ -1,99 +1,162 @@
-import groupsData from "@/services/mockData/groups.json";
-
-// Simple delay function to simulate API calls
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+import { toast } from "react-toastify";
 
 class GroupService {
   constructor() {
-    this.groups = [...groupsData];
+    this.apperClient = null;
+    this.tableName = 'group_c';
+    this.initializeClient();
+  }
+
+  initializeClient() {
+    if (typeof window !== 'undefined' && window.ApperSDK) {
+      const { ApperClient } = window.ApperSDK;
+      this.apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+    }
   }
 
   async getAll() {
-    await delay(300);
-    return [...this.groups];
+    try {
+      if (!this.apperClient) this.initializeClient();
+      
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "members_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "created_at_c" } },
+          { field: { Name: "recent_activity_c" } },
+          { field: { Name: "CreatedOn" } }
+        ],
+        orderBy: [{ fieldName: "CreatedOn", sorttype: "DESC" }]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return [];
+      }
+
+      return response.data?.map(group => ({
+        Id: group.Id,
+        name: group.Name,
+        members: this.parseMembers(group.members_c),
+        type: group.type_c || 'Friends',
+        createdAt: group.created_at_c || group.CreatedOn,
+        recentActivity: group.recent_activity_c || 'Just now'
+      })) || [];
+
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching groups:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      return [];
+    }
   }
 
   async getById(Id) {
-    await delay(200);
-    const group = this.groups.find(g => g.Id === parseInt(Id));
-    if (!group) {
-      throw new Error("Group not found");
+    try {
+      if (!this.apperClient) this.initializeClient();
+      
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "members_c" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "created_at_c" } },
+          { field: { Name: "recent_activity_c" } },
+          { field: { Name: "CreatedOn" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, Id, params);
+      
+      if (!response || !response.data) {
+        throw new Error("Group not found");
+      }
+
+      const group = response.data;
+      return {
+        Id: group.Id,
+        name: group.Name,
+        members: this.parseMembers(group.members_c),
+        type: group.type_c || 'Friends',
+        createdAt: group.created_at_c || group.CreatedOn,
+        recentActivity: group.recent_activity_c || 'Just now'
+      };
+
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching group with ID ${Id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      throw error;
     }
-    return { ...group };
   }
 
   async create(groupData) {
-    await delay(400);
-    
-    // Find highest existing Id and add 1
-    const maxId = this.groups.reduce((max, group) => 
-      Math.max(max, group.Id), 0);
-    
-    const newGroup = {
-      Id: maxId + 1,
-      ...groupData,
-      createdAt: new Date().toISOString(),
-      recentActivity: "Just now"
-    };
-    
-    this.groups.push(newGroup);
-    return { ...newGroup };
-  }
+    try {
+      if (!this.apperClient) this.initializeClient();
+      
+      const params = {
+        records: [{
+          Name: groupData.name,
+          members_c: JSON.stringify(groupData.members || []),
+          type_c: groupData.type || 'Friends',
+          created_at_c: new Date().toISOString(),
+          recent_activity_c: 'Just now'
+        }]
+      };
 
-  async update(Id, updateData) {
-    await delay(350);
-    
-    const index = this.groups.findIndex(g => g.Id === parseInt(Id));
-    if (index === -1) {
-      throw new Error("Group not found");
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        toast.error(response.message);
+        return null;
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create group ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error}`);
+            });
+            if (record.message) toast.error(record.message);
+          });
+        }
+        
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating group:", error?.response?.data?.message);
+      } else {
+        console.error(error);
+      }
+      throw error;
     }
-    
-    this.groups[index] = { ...this.groups[index], ...updateData };
-    return { ...this.groups[index] };
   }
 
-  async delete(Id) {
-    await delay(200);
-    
-    const index = this.groups.findIndex(g => g.Id === parseInt(Id));
-    if (index === -1) {
-      throw new Error("Group not found");
+  parseMembers(membersStr) {
+    try {
+      return membersStr ? JSON.parse(membersStr) : [];
+    } catch {
+      return [];
     }
-    
-    this.groups.splice(index, 1);
-    return { success: true };
-  }
-
-  async addMember(groupId, memberData) {
-    await delay(300);
-    
-    const group = await this.getById(groupId);
-    const updatedMembers = [...group.members, memberData];
-    
-    return this.update(groupId, { members: updatedMembers });
-  }
-
-  async removeMember(groupId, memberId) {
-    await delay(300);
-    
-    const group = await this.getById(groupId);
-    const updatedMembers = group.members.filter(member => member.id !== memberId);
-    
-    return this.update(groupId, { members: updatedMembers });
-  }
-
-  async updateRecentActivity(groupId) {
-    await delay(200);
-    return this.update(groupId, { 
-      recentActivity: new Date().toLocaleDateString()
-    });
-  }
-
-  async getUserGroups(userId) {
-    await delay(250);
-    return this.groups.filter(group =>
-      group.members.some(member => member.id === userId)
-    );
   }
 }
 

@@ -55,7 +55,7 @@ return (
 
 {/* Expense Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
+<div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0 pr-2">
               <h4 className="font-semibold text-gray-900 font-display truncate text-sm sm:text-base">
                 {expense.description}
